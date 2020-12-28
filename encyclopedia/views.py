@@ -5,8 +5,12 @@ from django.urls import reverse
 from . import util
 
 class NewEntryForm(forms.Form):
-  form_title = forms.CharField(label = "Title")
-  form_content = forms.CharField(label = "Content")
+  title = forms.CharField(label = "Title", 
+          widget=forms.TextInput(attrs={'placeholder': 'Title here'})
+          )
+  content = forms.CharField(label = "Content", 
+            widget=forms.Textarea(attrs={'placeholder': 'Write the content here using Mardown2 markup language.'})
+            )
 
 def index(request):
     return render(request, "encyclopedia/index.html", {
@@ -27,8 +31,8 @@ def add(request):
     if inputform.is_valid():
       # takes the string in the attribute "task" and content from the object inputform 
       # and stores it in a variables called title and content 
-      title = inputform.cleaned_data["form_title"]
-      content = inputform.cleaned_data["form_content"]
+      title = inputform.cleaned_data["title"]
+      content = inputform.cleaned_data["content"]
       # write in file
       util.save_entry(title,content)
       return HttpResponseRedirect(reverse("encyclopedia:index"))
