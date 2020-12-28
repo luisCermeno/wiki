@@ -6,4 +6,7 @@
 
 {% block body %}
     {{content|safe}}
+    <form action="{% url 'encyclopedia:entry' title%}" method="GET">
+      <button type="submit" name="edit" value="true">Edit</button>
+    </form>
 {% endblock %}

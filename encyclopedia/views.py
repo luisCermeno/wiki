@@ -20,21 +20,28 @@ def index(request):
     })
 
 def entry(request, title):
-    if title in util.list_entries():
-      return render(request, "encyclopedia/entry.html", {
-          "title": title.capitalize(),
-          "content": util.decode(title)
+    if 'edit' in request.GET:
+      editform = NewEntryForm(initial={'title': title, 'content': util.get_entry(title)})
+      return render(request, "encyclopedia/edit.html", {
+        "title": title,
+        "form": editform
       })
     else:
-      message = ('#Page not found\n'
-          'We are **sorry** to announce that the page you are looking for has '
-          'not been **created** yet.\n\n'
-          'You might be the first creator to **write** it!'
-      )
-      return render(request, "encyclopedia/entry.html", {
-          "title": "Page not found",
-          "content": markdown2.markdown(message)
-      })
+      if title in util.list_entries():
+        return render(request, "encyclopedia/entry.html", {
+            "title": title.capitalize(),
+            "content": util.decode(title)
+        })
+      else:
+        message = ('#Page not found\n'
+            'We are **sorry** to announce that the page you are looking for has '
+            'not been **created** yet.\n\n'
+            'You might be the first creator to **write** it!'
+        )
+        return render(request, "encyclopedia/entry.html", {
+            "title": "Page not found",
+            "content": markdown2.markdown(message)
+        })
 
 def add(request):
   if request.method == "POST":
