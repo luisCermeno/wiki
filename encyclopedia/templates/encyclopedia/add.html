@@ -1,0 +1,17 @@
+{% extends "encyclopedia/layout.html" %}
+
+{% block title %}
+    Create New Page
+{% endblock %}
+
+{% block body %}
+  <h1>Create New Page:</h1>
+  <form action="{% url 'encyclopedia:add' %}" method="post">
+    <!-- csrf middelware token to fulfill cross site request forgery protection default by django -->
+    {% csrf_token %}
+    {{form}}
+    <input type="submit">
+  </form>
+  <a href="{% url 'encyclopedia:index' %}">View Entries</a>
+
+{% endblock %}
