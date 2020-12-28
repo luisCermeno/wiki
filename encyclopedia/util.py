@@ -46,9 +46,10 @@ def get_entry(title):
         return None
 
 def decode(title):
-    try:
-        encoded = get_entry(title)
-        decoded = markdown2.markdown(encoded)
-        return decoded
-    except FileNotFoundError:
-        return None
+    encoded = get_entry(title)
+    decoded = markdown2.markdown(encoded)
+    return decoded
+
+def match(target):
+  results = [s for s in list_entries() if target.upper() in s.upper()]
+  return results

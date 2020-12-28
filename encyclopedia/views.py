@@ -1,8 +1,10 @@
-from django.shortcuts import render
-from django.http import HttpResponseRedirect
+from django.shortcuts import render, redirect
+from django.http import HttpResponseRedirect, HttpResponse
 from django import forms
 from django.urls import reverse
 from . import util
+import random
+import markdown2
 
 class NewEntryForm(forms.Form):
   title = forms.CharField(label = "Title", 
@@ -18,10 +20,21 @@ def index(request):
     })
 
 def entry(request, title):
-    return render(request, "encyclopedia/entry.html", {
-        "title": title.capitalize(),
-        "content": util.decode(title)
-    })
+    if title in util.list_entries():
+      return render(request, "encyclopedia/entry.html", {
+          "title": title.capitalize(),
+          "content": util.decode(title)
+      })
+    else:
+      message = ('#Page not found\n'
+          'We are **sorry** to announce that the page you are looking for has '
+          'not been **created** yet.\n\n'
+          'You might be the first creator to **write** it!'
+      )
+      return render(request, "encyclopedia/entry.html", {
+          "title": "Page not found",
+          "content": markdown2.markdown(message)
+      })
 
 def add(request):
   if request.method == "POST":
@@ -45,3 +58,19 @@ def add(request):
   return render(request, "encyclopedia/add.html", {
     "form": NewEntryForm()
   })
+
+def search(request):
+  if request.method == "GET":
+    target = request.GET['q']
+    for entry in util.list_entries():
+      if target.upper() == entry.upper():
+        return redirect('encyclopedia:entry', title=entry)
+    else:
+      return render(request, "encyclopedia/search.html", {
+        "results": util.match(target),
+        "title": target
+    })
+
+def render_random(request):
+    random_title = random.choice(util.list_entries())
+    return redirect('encyclopedia:entry', title=random_title)
