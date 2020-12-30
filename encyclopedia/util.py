@@ -1,9 +1,7 @@
-import re
+import re, markdown2
 
 from django.core.files.base import ContentFile
 from django.core.files.storage import default_storage
-
-import markdown2
 
 
 def list_entries():
@@ -45,10 +43,12 @@ def get_entry(title):
     except FileNotFoundError:
         return None
 
+
 def decode(title):
     encoded = get_entry(title)
     decoded = markdown2.markdown(encoded)
     return decoded
+
 
 def match(target):
   results = [s for s in list_entries() if target.upper() in s.upper()]

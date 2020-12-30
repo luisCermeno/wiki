@@ -1,7 +1,11 @@
 {% extends "encyclopedia/layout.html" %}
 
 {% block title %}
-    Create New Page
+  {% if edit == "true" %}
+  <title>Edit Page - Wiki</title>
+  {% else %}
+  <title>Create New Page - Wiki</title>
+  {% endif %}
 {% endblock %}
 
 {% block body %}
@@ -10,6 +14,7 @@
   {% else %}
     <h1>Create New Page:</h1>
   {% endif %}
+  <!-- error message -->
   {{ msg|safe }}
   <form action="{% url 'encyclopedia:add' %}" method="post">
     <!-- csrf middelware token to fulfill cross site request forgery protection default by django -->
@@ -34,5 +39,4 @@
     <input type="submit">
   </form>
   <a href="{% url 'encyclopedia:index' %}">View Entries</a>
-
 {% endblock %}

@@ -1,59 +1,74 @@
+import random, markdown2
+
 from django.shortcuts import render, redirect
 from django.http import HttpResponseRedirect, HttpResponse
 from django import forms
 from django.urls import reverse
+
 from . import util
-import random
-import markdown2
+
 
 class NewEntryForm(forms.Form):
-  title = forms.CharField(label = "Title", 
-          widget=forms.TextInput(attrs={'placeholder': 'Title here'})
-          )
-  content = forms.CharField(label = "Content", 
-            widget=forms.Textarea(attrs={'placeholder': 'Write the content here using Mardown2 markup language.'})
-            )
+  title = forms.CharField(
+    label = "Title", 
+    widget = forms.TextInput(attrs={
+      'placeholder': 'Title here'
+    })
+    )
+  content = forms.CharField(
+    label = "Content", 
+    widget = forms.Textarea(attrs={
+      'placeholder': 'Write the content here using Mardown2 markup language.'
+    })
+    )
 
 msg_notfound = ('#Page not found\n'
-    'We are **sorry** to announce that the page you are looking for has '
-    'not been **created** yet.\n\n'
-    'You might be the first creator to **write** it!'
+  'We are **sorry** to announce that the page you are looking for has '
+  'not been **created** yet.\n'
+  'You might be the first creator to **write** it!'
 )
 
 msg_aldycreated = ('#####The page you just submitted already exists!\n'
-    'A page with the **same title** already exists in the wiki.\n '
-    '**Check it out** searching for it with the search bar to your left or try again.\n\n'
+  'A page with the **same title** already exists in the wiki.\n '
+  '**Check it out** searching for it with the search bar to your left or try again.'
 )
 
 msg_invalidform = ('#####Sorry, it looks like there is something wrong!\n'
-    'We could not add you page because the **title** or **content** you just submitted is **not valid**.\n\n '
-    'Please try again.\n\n'
+  'We could not add you page because the **title** or **content** you just submitted is **not valid**.\n '
+  'Please try again.'
 )
+
 
 def index(request):
     return render(request, "encyclopedia/index.html", {
         "entries": util.list_entries()
     })
 
+
 def entry(request, title):
-    if 'edit' in request.GET:
-      editform = NewEntryForm(initial={'title': title, 'content': util.get_entry(title)})
-      return render(request, "encyclopedia/add.html", {
-        "edit" : request.GET["edit"],
+  if 'edit' in request.GET:
+    editform = NewEntryForm(
+      initial={
+        'title': title, 
+        'content': util.get_entry(title)
+      })
+    return render(request, "encyclopedia/add.html", {
+      "edit" : request.GET["edit"],
+      "title": title,
+      "form": editform
+    })
+  else:
+    if title in util.list_entries():
+      return render(request, "encyclopedia/entry.html", {
         "title": title,
-        "form": editform
+        "content": util.decode(title)
       })
     else:
-      if title in util.list_entries():
-        return render(request, "encyclopedia/entry.html", {
-            "title": title,
-            "content": util.decode(title)
-        })
-      else:
-        return render(request, "encyclopedia/entry.html", {
-            "title": "Page not found",
-            "content": markdown2.markdown(msg_notfound)
-        })
+      return render(request, "encyclopedia/entry.html", {
+        "title": "Page not found",
+        "content": markdown2.markdown(msg_notfound)
+      })
+
 
 def add(request):
   if request.method == "POST":
@@ -91,6 +106,7 @@ def add(request):
         "form": NewEntryForm(),
     })
 
+
 def search(request):
   if request.method == "GET":
     target = request.GET['q']
@@ -103,6 +119,7 @@ def search(request):
         "title": target
     })
 
+
 def render_random(request):
-    random_title = random.choice(util.list_entries())
-    return redirect('encyclopedia:entry', title=random_title)
+  random_title = random.choice(util.list_entries())
+  return redirect('encyclopedia:entry', title=random_title)
