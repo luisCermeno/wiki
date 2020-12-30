@@ -14,6 +14,22 @@ class NewEntryForm(forms.Form):
             widget=forms.Textarea(attrs={'placeholder': 'Write the content here using Mardown2 markup language.'})
             )
 
+msg_notfound = ('#Page not found\n'
+    'We are **sorry** to announce that the page you are looking for has '
+    'not been **created** yet.\n\n'
+    'You might be the first creator to **write** it!'
+)
+
+msg_aldycreated = ('#####The page you just submitted already exists!\n'
+    'A page with the **same title** already exists in the wiki.\n '
+    '**Check it out** searching for it with the search bar to your left or try again.\n\n'
+)
+
+msg_invalidform = ('#####Sorry, it looks like there is something wrong!\n'
+    'We could not add you page because the **title** or **content** you just submitted is **not valid**.\n\n '
+    'Please try again.\n\n'
+)
+
 def index(request):
     return render(request, "encyclopedia/index.html", {
         "entries": util.list_entries()
@@ -21,6 +37,7 @@ def index(request):
 
 def entry(request, title):
     if 'edit' in request.GET:
+      edit = request.GET["edit"]
       editform = NewEntryForm(initial={'title': title, 'content': util.get_entry(title)})
       return render(request, "encyclopedia/edit.html", {
         "title": title,
@@ -33,20 +50,16 @@ def entry(request, title):
             "content": util.decode(title)
         })
       else:
-        message = ('#Page not found\n'
-            'We are **sorry** to announce that the page you are looking for has '
-            'not been **created** yet.\n\n'
-            'You might be the first creator to **write** it!'
-        )
         return render(request, "encyclopedia/entry.html", {
             "title": "Page not found",
-            "content": markdown2.markdown(message)
+            "content": markdown2.markdown(msg_notfound)
         })
 
 def add(request):
   if request.method == "POST":
     # stores the data retrieved from the POST request into the object inputform
     inputform = NewEntryForm(request.POST)
+    edit = request.POST["edit"]
     # if form is valid(server side validation)
     if inputform.is_valid():
       # takes the string in the attribute "task" and content from the object inputform 
@@ -54,17 +67,27 @@ def add(request):
       title = inputform.cleaned_data["title"]
       content = inputform.cleaned_data["content"]
       # write in file
-      util.save_entry(title,content)
-      return HttpResponseRedirect(reverse("encyclopedia:index"))
+      if edit == "true":
+        util.save_entry(title,content)
+        return HttpResponseRedirect(reverse("encyclopedia:index"))
+      elif (title.upper() not in [x.upper() for x in util.list_entries()]) :
+        util.save_entry(title,content)
+        return HttpResponseRedirect(reverse("encyclopedia:index"))
+      else:
+        return render(request, "encyclopedia/add.html", {
+          "form": inputform,
+          "msg": markdown2.markdown(msg_aldycreated)
+        })
     # in case form is not valid, send back the form 
     else:
       return render(request, "encyclopedia/add.html", {
-        "form": inputform
+        "form": inputform,
+        "msg": markdown2.markdown(msg_invalidform)
       })
-
-  return render(request, "encyclopedia/add.html", {
-    "form": NewEntryForm()
-  })
+  elif request.method == "GET":
+    return render(request, "encyclopedia/add.html", {
+        "form": NewEntryForm(),
+    })
 
 def search(request):
   if request.method == "GET":
