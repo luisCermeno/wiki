@@ -66,11 +66,10 @@ def add(request):
       # and stores it in a variables called title and content 
       title = inputform.cleaned_data["title"]
       content = inputform.cleaned_data["content"]
+      # check if there is the entry is repeated and store it in variable
+      repeated = (title.upper() in [x.upper() for x in util.list_entries()])
       # write in file
-      if edit == "true":
-        util.save_entry(title,content)
-        return HttpResponseRedirect(reverse("encyclopedia:index"))
-      elif (title.upper() not in [x.upper() for x in util.list_entries()]) :
+      if edit == "true" or not repeated:
         util.save_entry(title,content)
         return HttpResponseRedirect(reverse("encyclopedia:index"))
       else:
