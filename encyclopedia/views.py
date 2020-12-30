@@ -37,16 +37,16 @@ def index(request):
 
 def entry(request, title):
     if 'edit' in request.GET:
-      edit = request.GET["edit"]
       editform = NewEntryForm(initial={'title': title, 'content': util.get_entry(title)})
-      return render(request, "encyclopedia/edit.html", {
+      return render(request, "encyclopedia/add.html", {
+        "edit" : request.GET["edit"],
         "title": title,
         "form": editform
       })
     else:
       if title in util.list_entries():
         return render(request, "encyclopedia/entry.html", {
-            "title": title.capitalize(),
+            "title": title,
             "content": util.decode(title)
         })
       else:
@@ -74,17 +74,20 @@ def add(request):
         return HttpResponseRedirect(reverse("encyclopedia:index"))
       else:
         return render(request, "encyclopedia/add.html", {
+          "edit": edit,
           "form": inputform,
           "msg": markdown2.markdown(msg_aldycreated)
         })
     # in case form is not valid, send back the form 
     else:
       return render(request, "encyclopedia/add.html", {
+        "edit": edit,
         "form": inputform,
         "msg": markdown2.markdown(msg_invalidform)
       })
   elif request.method == "GET":
     return render(request, "encyclopedia/add.html", {
+        "edit": "false",
         "form": NewEntryForm(),
     })
 

@@ -5,7 +5,11 @@
 {% endblock %}
 
 {% block body %}
-  <h1>Create New Page:</h1>
+  {% if edit == "true" %}
+    <h1>Edit Page:</h1>
+  {% else %}
+    <h1>Create New Page:</h1>
+  {% endif %}
   {{ msg|safe }}
   <form action="{% url 'encyclopedia:add' %}" method="post">
     <!-- csrf middelware token to fulfill cross site request forgery protection default by django -->
@@ -22,7 +26,11 @@
         <div for="{{ form.content.id_for_label }}">Content:</div>
         {{ form.content }}
     </div>
-    <input type="hidden" name="edit" value="false">
+    {% if edit == "true" %}
+      <input type="hidden" name="edit" value="true">
+    {% else %}
+      <input type="hidden" name="edit" value="true">
+    {% endif %}
     <input type="submit">
   </form>
   <a href="{% url 'encyclopedia:index' %}">View Entries</a>
