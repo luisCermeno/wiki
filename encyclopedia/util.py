@@ -51,5 +51,5 @@ def decode(title):
 
 
 def match(target):
-  results = [s for s in list_entries() if target.upper() in s.upper()]
-  return results
+    results = [s for s in list_entries() if target.upper() in s.upper()]
+    return results
