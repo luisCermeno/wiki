@@ -14,28 +14,28 @@ class NewEntryForm(forms.Form):
         widget = forms.TextInput(attrs={
             'placeholder': 'Title here'
         })
-        )
+    )
     content = forms.CharField(
         label = "Content", 
         widget = forms.Textarea(attrs={
             'placeholder': 'Write the content here using Mardown2 markup language.'
         })
-        )
+    )
 
 msg_notfound = ('#Page not found\n'
     'We are **sorry** to announce that the page you are looking for has '
-    'not been **created** yet.\n'
+    'not been **created** yet.\n\n'
     'You might be the first creator to **write** it!'
 )
 
 msg_aldycreated = ('#####The page you just submitted already exists!\n'
-    'A page with the **same title** already exists in the wiki.\n '
-    '**Check it out** searching for it with the search bar to your left or try again.'
+    'A page with the **same title** already exists in the wiki.\n\n'
+    '**Check it out** searching for it or try again.'
 )
 
 msg_invalidform = ('#####Sorry, it looks like there is something wrong!\n'
-    'We could not add you page because the **title** or **content** you just submitted is **not valid**.\n '
-    'Please try again.'
+    'We could not add you page because the **title** or **content** you just submitted is **not valid**.\n\n '
+    'Please **try again**.'
 )
 
 
