@@ -86,7 +86,10 @@ def add(request):
             # write in file
             if edit == "true" or not repeated:
                 util.save_entry(title,content)
-                return HttpResponseRedirect(reverse("encyclopedia:index"))
+                return render(request, "encyclopedia/entry.html", {
+                  "title": title,
+                  "content": util.decode(title)
+                })
             else:
                 return render(request, "encyclopedia/add.html", {
                     "edit": edit,
